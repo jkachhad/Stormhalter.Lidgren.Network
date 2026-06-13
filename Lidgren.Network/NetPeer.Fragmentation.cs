@@ -15,12 +15,19 @@ namespace Lidgren.Network
 		{
 			// Note: this group id is PER SENDING/NetPeer; ie. same id is sent to all recipients;
 			// this should be ok however; as long as recipients differentiate between same id but different sender
-			int group = Interlocked.Increment(ref m_lastUsedFragmentGroup);
-			if (group >= NetConstants.MaxFragmentationGroups)
+			int group;
+			while (true)
 			{
-				// @TODO: not thread safe; but in practice probably not an issue
-				m_lastUsedFragmentGroup = 1;
-				group = 1;
+				var current = m_lastUsedFragmentGroup;
+				var next = current + 1;
+				if (next >= NetConstants.MaxFragmentationGroups)
+					next = 1;
+
+				if (Interlocked.CompareExchange(ref m_lastUsedFragmentGroup, next, current) == current)
+				{
+					group = next;
+					break;
+				}
 			}
 			msg.m_fragmentGroup = group;
 

@@ -330,12 +330,16 @@ namespace Lidgren.Network
 				// do handshake heartbeats
 				if ((m_frameCounter % 3) == 0)
 				{
-					foreach (var kvp in m_handshakes)
+					List<KeyValuePair<NetEndPoint, NetConnection>> handshakes;
+					lock (m_handshakes)
+						handshakes = new List<KeyValuePair<NetEndPoint, NetConnection>>(m_handshakes);
+
+					foreach (var kvp in handshakes)
 					{
-						NetConnection conn = kvp.Value as NetConnection;
+						NetConnection conn = kvp.Value;
 #if DEBUG
 						// sanity check
-						if (kvp.Key != kvp.Key)
+						if (kvp.Key != conn.RemoteEndPoint)
 							LogWarning("Sanity fail! Connection in handshake list under wrong key!");
 #endif
 						conn.UnconnectedHeartbeat(now);
@@ -343,13 +347,16 @@ namespace Lidgren.Network
 						{
 #if DEBUG
 							// sanity check
-							if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint))
+							lock (m_handshakes)
 							{
-								LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
-								m_handshakes.Remove(conn.RemoteEndPoint);
+								if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint))
+								{
+									LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
+									m_handshakes.Remove(conn.RemoteEndPoint);
+								}
 							}
 #endif
-							break; // collection has been modified
+							continue;
 						}
 					}
 				}

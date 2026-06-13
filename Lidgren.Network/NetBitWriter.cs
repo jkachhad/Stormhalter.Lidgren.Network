@@ -521,39 +521,38 @@ namespace Lidgren.Network
 	    /// </summary>
 	    public static void Zero(Span<byte> destination, int numberOfBits, int destBitOffset)
 	    {
-	        var dstBytePtr = destBitOffset >> 3;
-	        var firstPartLen = destBitOffset & 7;
-	        var numberOfBytes = numberOfBits >> 3;
-	        var endBits = numberOfBits & 7;
-
-	        if (firstPartLen == 0)
+	        if (numberOfBits <= 0)
 	        {
-        		destination.Slice(destBitOffset / 8, numberOfBytes).Fill(0);
-
-        		if (endBits <= 0)
-        		{
-        			return;
-        		}
-
-        		var endByteSpan = destination.Slice(numberOfBytes, 1);
-
-        		endByteSpan[0] = (byte) (endByteSpan[0] & ~(byte.MaxValue >> (8 - endBits)));
-
-        		return;
+	        	return;
 	        }
 
+	        var dstBytePtr = destBitOffset >> 3;
+	        var firstPartLen = destBitOffset & 7;
+	        var bitsLeft = numberOfBits;
 
-	        var lastPartLen = 8 - firstPartLen;
+	        if (firstPartLen != 0)
+	        {
+	        	var firstBits = Math.Min(8 - firstPartLen, bitsLeft);
+	        	var zeroMask = ((1 << firstBits) - 1) << firstPartLen;
+	        	destination[dstBytePtr] &= (byte)~zeroMask;
 
-	        destination[dstBytePtr] &= (byte)(255 >> lastPartLen);
+	        	bitsLeft -= firstBits;
+	        	dstBytePtr++;
+	        }
 
-	        ++dstBytePtr;
+	        var numberOfBytes = bitsLeft >> 3;
+	        if (numberOfBytes > 0)
+	        {
+	        	destination.Slice(dstBytePtr, numberOfBytes).Fill(0);
+	        	dstBytePtr += numberOfBytes;
+	        	bitsLeft &= 7;
+	        }
 
-	        destination.Slice(dstBytePtr, numberOfBytes-2).Fill(0);
-
-	        dstBytePtr = numberOfBytes - 2;
-
-	        destination[dstBytePtr] &= (byte)(255 << firstPartLen);
+	        if (bitsLeft > 0)
+	        {
+	        	var zeroMask = (1 << bitsLeft) - 1;
+	        	destination[dstBytePtr] &= (byte)~zeroMask;
+	        }
 	    }
 	}
 }

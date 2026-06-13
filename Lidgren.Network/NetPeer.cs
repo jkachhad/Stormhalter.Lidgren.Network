@@ -94,7 +94,11 @@ namespace Lidgren.Network
 		/// </summary>
 		public int ConnectionsCount
 		{
-			get { return m_connections.Count; }
+			get
+			{
+				lock (m_connections)
+					return m_connections.Count;
+			}
 		}
 
 		/// <summary>

@@ -125,7 +125,7 @@ namespace Lidgren.Network
 		public ulong NextUInt64()
 		{
 			ulong retval = NextUInt32();
-			retval |= NextUInt32() << 32;
+			retval |= (ulong)NextUInt32() << 32;
 			return retval;
 		}
 
@@ -140,7 +140,7 @@ namespace Lidgren.Network
 			if (m_nextBoolIndex >= 32)
 			{
 				m_boolValues = NextUInt32();
-				m_nextBoolIndex = 1;
+				m_nextBoolIndex = 0;
 			}
 
 			var retval = ((m_boolValues >> m_nextBoolIndex) & 1) == 1;

@@ -249,7 +249,7 @@ namespace Lidgren.Network
 
 			if (m_configuration.IsMessageTypeEnabled(NetIncomingMessageType.UnconnectedData) == false)
 			{
-				Interlocked.Decrement(ref om.m_recyclingCount);
+				Recycle(om);
 				return; // dropping unconnected message since it's not enabled for receiving
 			}
 
