@@ -82,7 +82,7 @@ namespace Lidgren.Network
 		/// </summary>
 		public Span<byte> ReadBytes(Span<byte> into)
 		{
-			NetException.Assert(m_bitLength - m_readPosition + 7 >= (into.Length * 8), c_readOverflowError);
+			NetException.Assert(m_bitLength - m_readPosition >= (into.Length * 8), c_readOverflowError);
 
 			NetBitWriter.ReadBytes(Data, m_readPosition, into);
 			m_readPosition += (8 * into.Length);
@@ -104,7 +104,7 @@ namespace Lidgren.Network
 		/// </summary>
 		public bool ReadBytes(int numberOfBytes, [MaybeNullWhen(false)] out byte[] result)
 		{
-			if (m_bitLength - m_readPosition + 7 < (numberOfBytes * 8))
+			if (m_bitLength - m_readPosition < (numberOfBytes * 8))
 			{
 				result = null;
 				return false;
@@ -121,7 +121,7 @@ namespace Lidgren.Network
 		/// </summary>
 		public bool TryReadBytes(Span<byte> into)
 		{
-			if (m_bitLength - m_readPosition + 7 < (into.Length * 8))
+			if (m_bitLength - m_readPosition < (into.Length * 8))
 			{
 				return false;
 			}
@@ -139,7 +139,7 @@ namespace Lidgren.Network
 		/// <param name="numberOfBytes">The number of bytes to read</param>
 		public void ReadBytes(byte[] into, int offset, int numberOfBytes)
 		{
-			NetException.Assert(m_bitLength - m_readPosition + 7 >= (numberOfBytes * 8), c_readOverflowError);
+			NetException.Assert(m_bitLength - m_readPosition >= (numberOfBytes * 8), c_readOverflowError);
 			NetException.Assert(offset + numberOfBytes <= into.Length);
 
 			NetBitWriter.ReadBytes(Data, numberOfBytes, m_readPosition, into, offset);
