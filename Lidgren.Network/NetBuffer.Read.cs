@@ -612,7 +612,7 @@ namespace Lidgren.Network
 				return true;
 			}
 
-			if (m_bitLength - m_readPosition < (byteLen * 8))
+			if ((ulong)(m_bitLength - m_readPosition) < ((ulong)byteLen * 8))
 			{
 				result = string.Empty;
 				return false;
