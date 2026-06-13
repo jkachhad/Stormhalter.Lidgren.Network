@@ -335,7 +335,7 @@ namespace Lidgren.Network
 						NetConnection conn = kvp.Value as NetConnection;
 #if DEBUG
 						// sanity check
-						if (kvp.Key != kvp.Key)
+						if (kvp.Key != conn.RemoteEndPoint)
 							LogWarning("Sanity fail! Connection in handshake list under wrong key!");
 #endif
 						conn.UnconnectedHeartbeat(now);
