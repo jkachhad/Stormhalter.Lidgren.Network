@@ -41,7 +41,7 @@ namespace UnitTests
         [Test]
         public void TestResolveBasic()
         {
-            var addr = NetUtility.Resolve("example.com");
+            var addr = NetUtility.Resolve("localhost");
 
             Assert.That(addr, Is.Not.Null);
         }
@@ -49,7 +49,7 @@ namespace UnitTests
         [Test]
         public void TestResolveEndPointBasic()
         {
-            var addr = NetUtility.Resolve("example.com", 55555);
+            var addr = NetUtility.Resolve("localhost", 55555);
 
             Assert.That(addr, Is.Not.Null);
             Assert.That(addr.Port, Is.EqualTo(55555));
@@ -62,7 +62,7 @@ namespace UnitTests
         {
 	        IgnoreIfActions();
 	        
-            var addr = NetUtility.Resolve("example.com", family);
+            var addr = NetUtility.Resolve("localhost", family);
 
             Assert.That(addr?.AddressFamily, Is.EqualTo(family));
         }
@@ -70,7 +70,7 @@ namespace UnitTests
         [Test]
         public void TestResolveNothing()
         {
-            var addr = NetUtility.Resolve("thisdomaindoesnotexistandneverwill.example.com");
+            var addr = NetUtility.Resolve("127.0.0.1", AddressFamily.InterNetworkV6);
 
             Assert.That(addr, Is.Null);
         }
@@ -78,7 +78,7 @@ namespace UnitTests
         [Test]
         public async Task TestResolveAsyncBasic()
         {
-            var addr = await NetUtility.ResolveAsync("example.com");
+            var addr = await NetUtility.ResolveAsync("localhost");
 
             Assert.That(addr, Is.Not.Null);
         }
@@ -86,7 +86,7 @@ namespace UnitTests
         [Test]
         public async Task TestResolveEndPointAsyncBasic()
         {
-            var addr = await NetUtility.ResolveAsync("example.com", 55555);
+            var addr = await NetUtility.ResolveAsync("localhost", 55555);
 
             Assert.That(addr, Is.Not.Null);
             Assert.That(addr.Port, Is.EqualTo(55555));
@@ -99,7 +99,7 @@ namespace UnitTests
         {
 	        IgnoreIfActions();
          
-	        var addr = await NetUtility.ResolveAsync("example.com", family);
+	        var addr = await NetUtility.ResolveAsync("localhost", family);
 
             Assert.That(addr?.AddressFamily, Is.EqualTo(family));
         }
@@ -107,7 +107,7 @@ namespace UnitTests
         [Test]
         public async Task TestResolveAsyncNothing()
         {
-            var addr = await NetUtility.ResolveAsync("thisdomaindoesnotexistandneverwill.example.com");
+            var addr = await NetUtility.ResolveAsync("127.0.0.1", AddressFamily.InterNetworkV6);
 
             Assert.That(addr, Is.Null);
         }
@@ -117,7 +117,7 @@ namespace UnitTests
         public async Task TestResolveAsyncCallback()
         {
 	        var tcs = new TaskCompletionSource<IPAddress?>();
-	        NetUtility.ResolveAsync("example.com", result => tcs.SetResult(result));
+	        NetUtility.ResolveAsync("localhost", result => tcs.SetResult(result));
 
 	        var result = await tcs.Task.WaitAsync(TimeSpan.FromSeconds(30));
 
