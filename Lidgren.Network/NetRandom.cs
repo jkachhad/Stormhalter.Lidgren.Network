@@ -125,7 +125,7 @@ namespace Lidgren.Network
 		public ulong NextUInt64()
 		{
 			ulong retval = NextUInt32();
-			retval |= NextUInt32() << 32;
+			retval |= (ulong)NextUInt32() << 32;
 			return retval;
 		}
 
