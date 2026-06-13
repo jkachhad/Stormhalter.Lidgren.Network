@@ -68,7 +68,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestResolveNothing()
+        public void TestResolveAddressFamilyMismatch()
         {
             var addr = NetUtility.Resolve("127.0.0.1", AddressFamily.InterNetworkV6);
 
@@ -105,7 +105,7 @@ namespace UnitTests
         }
 
         [Test]
-        public async Task TestResolveAsyncNothing()
+        public async Task TestResolveAsyncAddressFamilyMismatch()
         {
             var addr = await NetUtility.ResolveAsync("127.0.0.1", AddressFamily.InterNetworkV6);
 
