@@ -6,6 +6,7 @@ namespace Lidgren.Network
 	{
 		private double m_sentPingTime;
 		private int m_sentPingNumber;
+		private int m_remoteTimeOffsetSampleCount;
 		private double m_averageRoundtripTime;
 		private double m_timeoutDeadline = double.MaxValue;
 
@@ -54,7 +55,7 @@ namespace Lidgren.Network
 		{
 			m_peer.VerifyNetworkThread();
 
-			m_sentPingNumber++;
+			m_sentPingNumber = (m_sentPingNumber + 1) & byte.MaxValue;
 
 			m_sentPingTime = NetTime.Now;
 			NetOutgoingMessage om = m_peer.CreateMessage(1);
@@ -102,6 +103,7 @@ namespace Lidgren.Network
 			if (m_averageRoundtripTime < 0)
 			{
 				m_remoteTimeOffset = diff;
+				m_remoteTimeOffsetSampleCount = 1;
 				m_averageRoundtripTime = rtt;
 				m_peer.LogDebug("Initiated average roundtrip time to " + NetTime.ToReadable(m_averageRoundtripTime) + " Remote time is: " + (now + diff));
 			}
@@ -109,7 +111,10 @@ namespace Lidgren.Network
 			{
 				m_averageRoundtripTime = (m_averageRoundtripTime * 0.7) + (rtt * 0.3);
 
-				m_remoteTimeOffset = ((m_remoteTimeOffset * (double)(m_sentPingNumber - 1)) + diff) / (double)m_sentPingNumber;
+				if (m_remoteTimeOffsetSampleCount < 256)
+					m_remoteTimeOffsetSampleCount++;
+
+				m_remoteTimeOffset = ((m_remoteTimeOffset * (double)(m_remoteTimeOffsetSampleCount - 1)) + diff) / (double)m_remoteTimeOffsetSampleCount;
 				m_peer.LogVerbose("Updated average roundtrip time to " + NetTime.ToReadable(m_averageRoundtripTime) + ", remote time to " + (now + m_remoteTimeOffset) + " (ie. diff " + m_remoteTimeOffset + ")");
 			}
 
