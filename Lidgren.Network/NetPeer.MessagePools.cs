@@ -80,8 +80,9 @@ namespace Lidgren.Network
 				{
 					// pool is full; replace randomly chosen entry to keep size distribution
 					var idx = NetRandom.Instance.Next(m_storagePool.Count);
-
-					m_storagePoolBytes -= m_storagePool[idx]!.Length;
+					var replacedStorage = m_storagePool[idx];
+					if (replacedStorage != null)
+						m_storagePoolBytes -= replacedStorage.Length;
 					m_storagePoolBytes += storage.Length;
 
 					m_storagePool[idx] = storage; // replace
